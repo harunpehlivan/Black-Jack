@@ -28,8 +28,8 @@ class cards:
                 elif i == 3:
                     suit = 'S'
                 self.cardsL.append([card, suit])
-                
-        self.cardsL = self.cardsL * 4
+
+        self.cardsL *= 4
 
     def getCards(self):
         return self.cardsL
@@ -61,15 +61,8 @@ class dealer:
         if self.cards[0][0] == 1 and self.cards[1][0] == 1:
             value = 2
         else:
-            if self.cards[0][0] == 11 or self.cards[0][0] == 12 or self.cards[0][0] == 13:
-                value += 10
-            else:
-                value += self.cards[0][0]
-            if self.cards[1][0] == 11 or self.cards[1][0] == 12 or self.cards[1][0] == 13:
-                value += 10
-            else:
-                value += self.cards[1][0]
-
+            value += 10 if self.cards[0][0] in [11, 12, 13] else self.cards[0][0]
+            value += 10 if self.cards[1][0] in [11, 12, 13] else self.cards[1][0]
         self.curValue = value
 
         if value == 11 and (self.cards[0][0] == 1 or self.cards[1][0] == 1):
@@ -87,7 +80,7 @@ class dealer:
         self.cards.append(card)
         self.cardsL.pop(rand)
 
-        if card[0] == 11 or card[0] == 12 or card[0] == 13:
+        if card[0] in [11, 12, 13]:
             value = 10
         elif card[0] == 1 and self.curValue == 10:
             value = 11
@@ -101,8 +94,6 @@ class dealer:
         self.curValue += value
         if self.curValue < 17:
             self.hit()
-        elif self.curValue > 21:
-            return self.curValue
         else:
             return self.curValue
 
@@ -134,15 +125,8 @@ class player():
         self.cardsL = self.cardsL
 
         value = 0
-        if self.cards[0][0] == 11 or self.cards[0][0] == 12 or self.cards[0][0] == 13:
-            value += 10
-        else:
-            value += self.cards[0][0]
-        if self.cards[1][0] == 11 or self.cards[1][0] == 12 or self.cards[1][0] == 13:
-            value += 10
-        else:
-            value += self.cards[1][0]
-
+        value += 10 if self.cards[0][0] in [11, 12, 13] else self.cards[0][0]
+        value += 10 if self.cards[1][0] in [11, 12, 13] else self.cards[1][0]
         self.curValue = value
 
         if value == 11 and (self.cards[0][0] == 1 or self.cards[1][0] == 1):
@@ -158,7 +142,7 @@ class player():
         self.cards.append(card)
         self.cardsL.pop(rand)
 
-        if card[0] == 11 or card[0] == 12 or card[0] == 13:
+        if card[0] in [11, 12, 13]:
             value = 10
         elif card[0] == 1 and self.curValue == 10:
             value = 11
@@ -170,10 +154,13 @@ class player():
             value = card[0]
 
         self.curValue += value
-        if self.curValue > 21 and self.cards.__contains__(1):
-            if self.cards.count(1) == 1:
-                if self.curValue - 10 < 22:
-                    self.curValue = self.curValue - 10
+        if (
+            self.curValue > 21
+            and self.cards.__contains__(1)
+            and self.cards.count(1) == 1
+            and self.curValue < 32
+        ):
+            self.curValue = self.curValue - 10
 
 
         return card
