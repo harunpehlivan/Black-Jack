@@ -29,8 +29,6 @@ pygame.display.flip()
 onTable = []
 topCards = []
 
-cardImg = [None]
-    # Load 52 Images
 two_clubs = pygame.image.load(os.path.join('png', '2_of_clubs.png'))
 two_diamonds = pygame.image.load(os.path.join('png', '2_of_diamonds.png'))
 two_hearts = pygame.image.load(os.path.join('png', '2_of_hearts.png'))
@@ -96,19 +94,24 @@ ace_spades = pygame.image.load(os.path.join('png', 'ace_of_spades.png'))
 ace_diamonds = pygame.image.load(os.path.join('png', 'ace_of_diamonds.png'))
 ace_hearts = pygame.image.load(os.path.join('png', 'ace_of_hearts.png'))
 
-cardImg.append([ace_clubs, ace_diamonds, ace_hearts, ace_spades])
-cardImg.append([two_clubs, two_diamonds, two_hearts, two_spades])
-cardImg.append([three_clubs, three_diamonds, three_hearts, three_spades])
-cardImg.append([four_clubs, four_diamonds, four_hearts, four_spades])
-cardImg.append([five_clubs, five_diamonds, five_hearts, five_spades])
-cardImg.append([six_clubs, six_diamonds, six_hearts, six_spades])
-cardImg.append([seven_clubs, seven_diamonds, seven_hearts, seven_spades])
-cardImg.append([eight_clubs, eight_diamonds, eight_hearts, eight_spades])
-cardImg.append([nine_clubs, nine_diamonds, nine_hearts, nine_spades])
-cardImg.append([ten_clubs, ten_diamonds, ten_hearts, ten_spades])
-cardImg.append([jack_clubs, jack_diamonds, jack_hearts, jack_spades])
-cardImg.append([queen_clubs, queen_diamonds, queen_hearts, queen_spades])
-cardImg.append([king_clubs, king_diamonds, king_hearts, king_spades])
+cardImg = [
+    None,
+    *(
+        [ace_clubs, ace_diamonds, ace_hearts, ace_spades],
+        [two_clubs, two_diamonds, two_hearts, two_spades],
+        [three_clubs, three_diamonds, three_hearts, three_spades],
+        [four_clubs, four_diamonds, four_hearts, four_spades],
+        [five_clubs, five_diamonds, five_hearts, five_spades],
+        [six_clubs, six_diamonds, six_hearts, six_spades],
+        [seven_clubs, seven_diamonds, seven_hearts, seven_spades],
+        [eight_clubs, eight_diamonds, eight_hearts, eight_spades],
+        [nine_clubs, nine_diamonds, nine_hearts, nine_spades],
+        [ten_clubs, ten_diamonds, ten_hearts, ten_spades],
+        [jack_clubs, jack_diamonds, jack_hearts, jack_spades],
+        [queen_clubs, queen_diamonds, queen_hearts, queen_spades],
+        [king_clubs, king_diamonds, king_hearts, king_spades],
+    ),
+]
 
 one = pygame.image.load(os.path.join('chips', '1.png'))
 two = pygame.image.load(os.path.join('chips', '2.png'))
@@ -118,15 +121,18 @@ twenty = pygame.image.load(os.path.join('chips', '20.png'))
 
 didBet = False
 betChips = 0
-chips = []
 betArray = []
 playerChips = 50
 
-chips.append([one, 20, 225, 1])
-chips.append([two, 20, 300, 2])
-chips.append([five, 20, 375, 5])
-chips.append([ten, 20, 450, 10])
-chips.append([twenty, 20, 525, 20])
+chips = list(
+    (
+        [one, 20, 225, 1],
+        [two, 20, 300, 2],
+        [five, 20, 375, 5],
+        [ten, 20, 450, 10],
+        [twenty, 20, 525, 20],
+    )
+)
 
 
 def lost():
@@ -161,25 +167,28 @@ def bet():
         if ev.type == pygame.MOUSEBUTTONDOWN:
             pos = pygame.mouse.get_pos()
             for i in range(len(chips)):
-                if pos[0] > chips[i][1] and pos[0] < chips[i][1] + 50:
-                    if pos[1] > chips[i][2] and pos[1] < chips[i][2] + 50:
-                        if playerChips - chips[i][3] >= 0:
-                            betChips += chips[i][3]
-                            dealChips(chips[i][0], 525 + i * 50, 550, chips[i][1], chips[i][2])
-                            playerChips -= chips[i][3]
-                        else:
-                            root = tk.Tk()
-                            messagebox.showinfo('Not enough chips!', ('You do not have enough \n chips to bet that amount, \n your current amount of chips is ' + str(playerChips)))
-                            try:
-                                root.destroy()
-                            except:
-                                pass
+                if (
+                    pos[0] > chips[i][1]
+                    and pos[0] < chips[i][1] + 50
+                    and pos[1] > chips[i][2]
+                    and pos[1] < chips[i][2] + 50
+                ):
+                    if playerChips - chips[i][3] >= 0:
+                        betChips += chips[i][3]
+                        dealChips(chips[i][0], 525 + i * 50, 550, chips[i][1], chips[i][2])
+                        playerChips -= chips[i][3]
+                    else:
+                        root = tk.Tk()
+                        messagebox.showinfo('Not enough chips!', ('You do not have enough \n chips to bet that amount, \n your current amount of chips is ' + str(playerChips)))
+                        try:
+                            root.destroy()
+                        except:
+                            pass
         if ev.type == pygame.QUIT:
             pygame.quit()
-        if ev.type == pygame.KEYDOWN:
-            if betChips >= 1:
-                pygame.draw.rect(screen, (0, 128, 0), (429, 849, 600, 100))
-                break
+        if ev.type == pygame.KEYDOWN and betChips >= 1:
+            pygame.draw.rect(screen, (0, 128, 0), (429, 849, 600, 100))
+            break
 
 
 def drawChip(img, x, y):
@@ -260,13 +269,12 @@ def dealChips(img, x, y, s, w):
     for i in range(100):
         if movey >= endy and movex >= endx:
             break
-        else:
-            screen.fill((0, 128, 0))
-            drawChip(img, movex, movey)
-            if movex <= endx:
-                movex += constant_x
-            if movey <= endy:
-                movey += constant_y
+        screen.fill((0, 128, 0))
+        drawChip(img, movex, movey)
+        if movex <= endx:
+            movex += constant_x
+        if movey <= endy:
+            movey += constant_y
 
         for d in range(len(onTable)):
             drawCard(onTable[d][0], onTable[d][1], onTable[d][2])
